@@ -7,7 +7,7 @@
  * Time: 22:50
  */
 
-use app\assets\printAsset;
+use app\assets\PrintAsset;
 use app\models\CashHandler;
 use app\models\Cottage;
 use app\models\Table_cottages;
@@ -17,7 +17,7 @@ use nirvana\showloading\ShowLoadingAsset;
 use yii\web\View;
 
 ShowLoadingAsset::register($this);
-printAsset::register($this);
+PrintAsset::register($this);
 
 $this->title = 'Отчёт по платежам';
 

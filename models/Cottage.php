@@ -9,6 +9,7 @@
 namespace app\models;
 
 use app\models\database\Mail;
+use app\models\handlers\BillsHandler;
 use app\models\interfaces\CottageInterface;
 use app\models\tables\Table_penalties;
 use DOMDocument;
@@ -86,6 +87,14 @@ class Cottage extends Model
             $this->fines = Table_penalties::find()->where(['cottage_number' => $cottageId])->all();
         } else {
             $this->lastPowerFillDate = TimeHandler::getCurrentShortMonth();
+        }
+        // проверю наличие нераспределённого депозита
+        $bills = Table_payment_bills::find()->where(['>', "depositUsed", 0])->andWhere(['isPayed' => 0])->andWhere(['cottageNumber' => $cottageId])->all();
+        foreach ($bills as $bill) {
+            if(CashHandler::toRubles($bill->payedSumm) < CashHandler::toRubles($bill->depositUsed)){
+                \Yii::$app->session->addFlash('danger', "Имеются нераспределённые средства в оплаченных счетах($bill->id). Распределите их или закройте счета с их использованием<buton class='buttonShowPaymentsStory btn btn-info'>Просмотреть счета</buton>");
+                break;
+            }
         }
     }
 
@@ -294,12 +303,13 @@ class Cottage extends Model
      */
     public static function getPreviousCottage(): string
     {
+
         $link = $_SERVER['HTTP_REFERER'];
-        if (preg_match('/https:\/\/dev\.com\/show-cottage\/(\d+)/', $link, $matches)) {
+        if (preg_match('/.+\/show-cottage\/(\d+)/', $link, $matches)) {
             while ($next = --$matches[1]) {
                 try {
                     if (self::getCottageByLiteral($next) !== null) {
-                        return 'https://dev.com/show-cottage/' . $next;
+                        return '/show-cottage/' . $next;
                     }
                     if ($next < 1) {
                         break;
@@ -309,7 +319,7 @@ class Cottage extends Model
                 }
             }
         }
-        return 'https://dev.com/show-cottage/180';
+        return '/show-cottage/180';
     }
 
     /**
@@ -318,11 +328,11 @@ class Cottage extends Model
     public static function getNextCottage(): string
     {
         $link = $_SERVER['HTTP_REFERER'];
-        if (preg_match('/https:\/\/dev\.com\/show-cottage\/(\d+)/', $link, $matches)) {
+        if (preg_match('/.+\/show-cottage\/(\d+)/', $link, $matches)) {
             while ($next = ++$matches[1]) {
                 try {
                     if (self::getCottageByLiteral($next) !== null) {
-                        return 'https://dev.com/show-cottage/' . $next;
+                        return '/show-cottage/' . $next;
                     }
                     if ($next > 180) {
                         break;
@@ -332,7 +342,7 @@ class Cottage extends Model
                 }
             }
         }
-        return 'https://dev.com/show-cottage/1';
+        return '/show-cottage/1';
     }
 
     /**
