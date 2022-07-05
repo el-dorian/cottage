@@ -11,6 +11,7 @@ use app\models\ExceptionWithStatus;
 use app\models\Filling;
 use app\models\FinesHandler;
 use ErrorException;
+use JetBrains\PhpStorm\ArrayShape;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -21,7 +22,7 @@ use yii\widgets\ActiveForm;
 class CottageController extends Controller
 {
 
-    public function behaviors(): array
+    #[ArrayShape(['access' => "array"])] public function behaviors(): array
     {
         return [
             'access' => [

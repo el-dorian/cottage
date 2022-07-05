@@ -18,7 +18,7 @@ class CottagesShowWidget extends Widget
     public function init()
     {
         $index = 1;
-        $max = 180;
+        $max = 192;
         $debts = CottagesFastInfo::getFullInfo();
         /** @var Table_cottages $cottage */
         foreach ($this->cottages as $cottage) {

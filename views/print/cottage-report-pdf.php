@@ -7,7 +7,7 @@
  * Time: 22:50
  */
 
-use app\assets\printAsset;
+use app\assets\PrintAsset;
 use app\models\CashHandler;
 use app\models\Cottage;
 use app\models\Table_cottages;
@@ -15,7 +15,7 @@ use app\models\TimeHandler;
 use app\models\utils\CottageDutyReport;
 use yii\web\View;
 
-printAsset::register($this);
+PrintAsset::register($this);
 
 $this->title = 'Отчёт по платежам';
 
@@ -34,7 +34,7 @@ $duty = new CottageDutyReport($cottageInfo, $end);
 <head>
     <meta charset="utf-8">
     <title>Квитанции</title>
-    <style type="text/css">
+    <style>
         .small-text {
             font-size: 9px;
         }
