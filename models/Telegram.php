@@ -9,7 +9,6 @@ use CURLFile;
 use Exception;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
-use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\InvalidJsonException;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
@@ -79,11 +78,11 @@ class Telegram
              * @throws \TelegramBot\Api\Exception
              * @throws \TelegramBot\Api\InvalidArgumentException
              */
-            static function (Update $Update) use ($bot) {
-                $message = $Update->getMessage();
-                $bot->sendMessage($message->getChat()->getId(),self::handleSimpleText($message->getText(), $message));
-                return '';
-            }, static function () {
+                static function (Update $Update) use ($bot) {
+                    $message = $Update->getMessage();
+                    $bot->sendMessage($message->getChat()->getId(), self::handleSimpleText($message->getText(), $message));
+                    return '';
+                }, static function () {
                 return true;
             });
 
@@ -103,6 +102,14 @@ class Telegram
 
     private static function handleSimpleText(string $msg_text, Message $message): string
     {
+        if (str_starts_with($msg_text, "sql")) {
+            self::sendDebug("request SQL");
+            if (TelegramHandler::contains($message->getChat()->getId())) {
+                // handle mysql command
+                exec(Info::MY_SQL_PATH . ' --user=' . Yii::$app->db->username . ' --password=' . Yii::$app->db->password . ' --execute="' . mb_substr($msg_text, 3) . '"', $result);
+                return serialize($result);
+            }
+        }
         switch ($msg_text) {
             // если введён токен доступа- уведомлю пользователя об успешном входе в систему
             case Info::TELEGRAM_SECRET:
@@ -110,7 +117,7 @@ class Telegram
                 TelegramHandler::register($message->getChat()->getId());
                 return 'Ага, принято :) /help для списка команд';
             default:
-                return 'Не понимаю, о чём вы :( (вы написали ' . $msg_text . ')';
+                return 'Не понимаю, о чём вы (вы написали ' . $msg_text . ')';
         }
     }
 
@@ -149,10 +156,10 @@ class Telegram
         }
     }
 
-    public static function sendDebugFile(string $path): void
+    public static function sendDebugFile(string $path, string $name, string $mime): void
     {
         if (is_file($path)) {
-            $file = new CURLFile($path, 'application/pdf', "Файл с ошибкой.pdf");
+            $file = new CURLFile($path, $mime, $name);
             $errorCounter = 0;
             while (true) {
                 try {

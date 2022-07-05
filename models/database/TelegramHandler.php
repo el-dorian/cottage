@@ -21,7 +21,7 @@ class TelegramHandler extends ActiveRecord
 
     public static function contains(int|string $getId): bool
     {
-        return self::find()->where(['person_id' => $getId])->count() === 1;
+        return self::find()->where(['person_id' => $getId])->count() > 0;
     }
 
     public static function register(int|string $getId): void
