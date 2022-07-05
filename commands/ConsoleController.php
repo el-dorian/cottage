@@ -9,13 +9,16 @@ namespace app\commands;
 
 use app\models\Cottage;
 use app\models\database\TelegramHandler;
+use app\models\Telegram;
 use app\models\Utils;
 use app\models\utils\FileUtils;
 use app\priv\Info;
+use DateTime;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
+use Yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -75,5 +78,14 @@ class ConsoleController extends Controller
                 $errorCounter++;
             }
         }
+    }
+
+    public function actionDoBackup(): void
+    {
+        $command = Info::MY_SQL_PATH . 'dump --user=' . Yii::$app->db->username . ' --password=' . Yii::$app->db->password . ' ' . Info::DB_NAME . ' --skip-add-locks > ' . Info::BACKUP_PATH . '/db.sql';
+        exec($command);
+        $date = new DateTime();
+        $d = $date->format('Y-m-d H:i:s');
+        Telegram::sendDebugFile(Info::BACKUP_PATH . '/db.sql', "Резервная копия базы данных СНТ Облепиха {$d}.sql", 'application/sql');
     }
 }

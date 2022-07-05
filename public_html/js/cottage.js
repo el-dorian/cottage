@@ -706,14 +706,18 @@ function basementFunctional() {
                                 }
 
                             }
-                        } else {
+                        }
+                        else if(simple['dividedSum'] < simple['payed-summ'] && simple['isPayed'] === 0){
+                            text += '<td><b class="text-info">Не распределено: ' + (simple['payed-summ'] - simple['dividedSum']).toFixed(2) + ' &#8381;</b></td>';
+                        }
+                        else {
                             text += '<td><b class="text-success">Оплачено полностью</b></td>';
                         }
                     } else {
                         if (!simple['isPayed']) {
                             text += '<td><b class="text-warning">Ожидает оплаты</b></td>';
                         } else {
-                            text += '<td><b class="text-danger">Не оплачено</b></td>';
+                            text += '<td><b class="text-danger">Закрыт. Не оплачен</b></td>';
                         }
                     }
                     if (simple['paymentTime']) {
@@ -766,7 +770,7 @@ function basementFunctional() {
         }
     }
 
-    const paymentsHistoryBtn = $('#buttonShowPaymentsStory');
+    const paymentsHistoryBtn = $('.buttonShowPaymentsStory');
     paymentsHistoryBtn.on('click.showHistory', function (e) {
         e.preventDefault();
         showPaymentsStory()
