@@ -92,6 +92,31 @@ class Utils extends Model
     }
 
     /**
+     * @throws Exception
+     */
+    public static function fillMembershipAccrualsForCottage($cottageId): void
+    {
+        $transaction = new DbTransaction();
+        $cottage = Cottages::getCottage($cottageId);
+        $firstFilledQuarter = MembershipHandler::getFirstFilledQuarter($cottage);
+        // внесу в таблицу данные по участку
+        $quartersList = TimeHandler::getQuarterList(['start' => $cottage->membershipPayFor, 'finish' => Table_tariffs_membership::find()->orderBy('quarter DESC')->one()->quarter]);
+        foreach ($quartersList as $key => $item) {
+            // если в таблице уже есть информация по этому участку- пропускаю
+            if (Accruals_membership::find()->where(['cottage_number' => $cottage->getCottageNumber(), 'quarter' => $key])->count()) {
+                continue;
+            }
+            // получу данные по этому месяцу, с учётом того, что у участка может быть индивидуальный тариф
+            $tariff = Table_tariffs_membership::findOne(['quarter' => $key]);
+            if ($tariff !== null) {
+                $square = CottageSquareChanges::getQuarterSquare($cottage, $key);
+                (new Accruals_membership(['cottage_number' => $cottage->getCottageNumber(), 'quarter' => $key, 'fixed_part' => $tariff->fixed_part, 'square_part' => $tariff->changed_part, 'counted_square' => $square]))->save();
+            }
+        }
+        $transaction->commitTransaction();
+    }
+
+    /**
      * @throws ExceptionWithStatus
      */
     public static function deleteTarget(): void
@@ -243,22 +268,12 @@ class Utils extends Model
      */
     public static function startRefreshMainData(): void
     {
-
-        $file = Yii::$app->basePath . '\\yii.bat';
-        if (is_file($file)) {
-            $command = "$file console/refresh-main-data";
+        $file = Yii::$app->basePath . '/yii';
+            $command = "php $file console/refresh-main-data";
             $outFilePath = Yii::$app->basePath . '/logs/content_change.log';
             $outErrPath = Yii::$app->basePath . '/logs/content_change_err.log';
             $command .= ' > ' . $outFilePath . ' 2>' . $outErrPath . ' &"';
-            try {
-                // попробую вызвать процесс асинхронно
-                $handle = new COM('WScript.Shell');
-                /** @noinspection PhpUndefinedMethodInspection */
-                $handle->Run($command, 0, false);
-            } catch (Exception) {
-                exec($command);
-            }
-        }
+            exec($command);
     }
 
     /**
@@ -381,6 +396,13 @@ class Utils extends Model
     {
 // добавлю в письмо бекап базы данных
         $command = Info::MY_SQL_PATH . 'dump --column-statistics=0 --no-tablespaces --user=' . Yii::$app->db->username . ' --password=' . Yii::$app->db->password . ' ' . Info::DB_NAME . ' --skip-add-locks > ' . Info::BACKUP_PATH . '/db.sql';
+        exec($command);
+    }
+
+    public static function sendDbBackup(): void
+    {
+        $file = Yii::$app->basePath . '/yii';
+        $command = "php $file console/do-backup"  . " > /dev/null &";
         exec($command);
     }
 }
