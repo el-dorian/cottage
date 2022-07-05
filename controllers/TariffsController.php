@@ -16,6 +16,7 @@ use app\models\Table_tariffs_power;
 use app\models\TargetHandler;
 use app\models\TariffsKeeper;
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\Url;
@@ -53,6 +54,8 @@ class TariffsController extends Controller
                             'disable-personal-additional',
                             'create-target',
                             'target-more',
+                            'membership-more',
+                            'power-more',
                             'change'
                         ],
                         'roles' => ['writer'],
@@ -212,6 +215,28 @@ class TariffsController extends Controller
         $view = $this->renderAjax('target', ['data' => $accruals]);
         return ['status' => 1,
             'header' => 'Подробности по целевым за ' . $year,
+            'data' => $view,
+        ];
+    }
+    #[ArrayShape(['status' => "int", 'header' => "string", 'data' => "string"])] public function actionMembershipMore($quarter): array
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        // получу данные по тарифу
+        $accruals = MembershipHandler::getQuarterStatistics($quarter);
+        $view = $this->renderAjax('membership', ['data' => $accruals]);
+        return ['status' => 1,
+            'header' => 'Подробности по членским за ' . $quarter,
+            'data' => $view,
+        ];
+    }
+    #[ArrayShape(['status' => "int", 'header' => "string", 'data' => "string"])] public function actionPowerMore($month): array
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        // получу данные по тарифу
+        $accruals = PowerHandler::getMonthStatistics($month);
+        $view = $this->renderAjax('power', ['data' => $accruals]);
+        return ['status' => 1,
+            'header' => 'Подробности по электроэнергии за ' . $month,
             'data' => $view,
         ];
     }
