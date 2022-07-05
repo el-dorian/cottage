@@ -225,7 +225,6 @@ if (!empty($activeSearch)) {
 						echo "<div class='col-sm-12 text-center'><h2>Ничего не найдено</h2></div>";
 					}
 				}
-
 				?>
             </div>
             <div class="tab-pane margened fade <?= $tabs['accrualsSearch'] ?>" id="accrualsSearch">
