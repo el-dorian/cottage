@@ -16,7 +16,7 @@ class Registry extends Model
 
     public $file;
 
-    const SCENARIO_PARSE = 'parse';
+    public const SCENARIO_PARSE = 'parse';
     /**
      * @var Table_bank_invoices[]
      */
@@ -32,7 +32,7 @@ class Registry extends Model
     public function rules(): array
     {
         return [
-            [['file'], 'file', 'skipOnEmpty' => false, 'extensions' => 'txt', 'maxFiles' => 1000],
+            [['file'], 'file', 'skipOnEmpty' => false, 'maxFiles' => 1000],
             [['file'], 'required', 'on' => self::SCENARIO_PARSE],
         ];
     }
