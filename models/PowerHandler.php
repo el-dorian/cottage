@@ -14,6 +14,7 @@ use app\models\database\PersonalPower;
 use app\models\handlers\BillsHandler;
 use app\models\interfaces\CottageInterface;
 use app\models\selections\PowerDebt;
+use app\models\selections\PowerInfo;
 use app\models\utils\DbTransaction;
 use app\models\utils\FirebaseHandler;
 use app\validators\CashValidator;
@@ -463,6 +464,7 @@ class PowerHandler extends Model
         }
         return (Table_additional_power_months::find()->where(['cottageNumber' => $cottageNumber, 'payed' => 'yes'])->orderBy('month DESC')->one())->month;
     }
+
 
     public function scenarios(): array
     {
@@ -1563,5 +1565,37 @@ class PowerHandler extends Model
             return ['status' => 1, 'message' => 'Операция отменена'];
         }
         return ['status' => 2, 'message' => 'Непредвиденная ситуация'];
+    }
+
+
+    /**
+     * @param $month
+     * @return PowerInfo[]
+     */
+    public static function getMonthStatistics($month): array
+    {
+        $answer = [];
+
+        $accrualsData = Table_power_months::findAll(['month' => $month]);
+        if (!empty($accrualsData)) {
+            foreach ($accrualsData as $accrual) {
+                $info = new PowerInfo();
+                $info->cottageNumber = $accrual->cottageNumber;
+                $info->amount = $accrual->countAmount();
+                $info->payed = $accrual->countPayed();
+                $answer[] = $info;
+            }
+        }
+        usort($answer, [__CLASS__, "compare"]);
+
+        return $answer;
+    }
+
+    public static function compare(PowerInfo $a, PowerInfo $b): int
+    {
+        if ($a->cottageNumber === $b->cottageNumber) {
+            return 0;
+        }
+        return $a->cottageNumber > $b->cottageNumber ? 1 : -1;
     }
 }

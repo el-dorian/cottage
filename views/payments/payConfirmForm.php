@@ -18,6 +18,7 @@ use app\models\Table_payed_power;
 use app\models\Table_payed_target;
 use app\models\Table_payment_bills;
 use app\models\Table_payment_bills_double;
+use app\models\Table_transactions;
 use app\models\tables\Table_view_fines_info;
 use app\models\TargetHandler;
 use app\models\TimeHandler;
@@ -38,6 +39,14 @@ $form = ActiveForm::begin(['id' => 'confirmCash', 'options' => ['class' => 'form
 
 $fullSumm = CashHandler::toRubles($model->totalSumm);
 $fromDeposit = $model->fromDeposit ?? 0;
+
+$transactions = Table_transactions::findAll(['billId' => $billInfo->id, 'cottageNumber' => $billInfo->cottageNumber]);
+if(!empty($transactions)){
+    foreach ($transactions as $transaction) {
+        $fromDeposit -= $transaction->usedDeposit;
+    }
+}
+
 $discount = $model->discount ?? 0;
 $payedBefore = $model->payedBefore ?? 0;
 

@@ -22,6 +22,7 @@ class PDFHandler
     {
         $dompdf = new Dompdf([
             'defaultFont' => 'times',//делаем наш шрифт шрифтом по умолчанию
+            'isRemoteEnabled' => true
         ]);
         $dompdf->loadHtml($text);
 // (Optional) Setup the paper size and orientation

@@ -238,6 +238,7 @@ class Pay extends Model
                 $billInfo = Table_payment_bills_double::findOne($this->billIdentificator);
                 if ($billInfo !== null) {
                     $cottageInfo = Cottage::getCottageByLiteral($billInfo->cottageNumber . '-a');
+                    $additionalCottageInfo = Cottage::getCottageByLiteral($billInfo->cottageNumber . '-a');
                 }
             } else {
                 $billInfo = Table_payment_bills::findOne($this->billIdentificator);
@@ -510,7 +511,10 @@ class Pay extends Model
                         }
                     }
                     // проверю, должен остаться 0, если нет- вызову ошибку
-                    throw new InvalidArgumentException("Не сходится сумма платежа за членские");
+                    if ($sum > 0) {
+                        // проверю, должен остаться 0, если нет- вызову ошибку
+                        throw new InvalidArgumentException("Не сходится сумма платежа за членские");
+                    }
                 }
 
             }
