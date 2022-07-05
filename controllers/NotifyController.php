@@ -38,6 +38,11 @@ class NotifyController extends Controller
                         'actions' => ['duties', 'reg-info', 'pay', 'pay-double', 'check-unsended', 'resend', 'send-errors', 'get-mail-list', 'mailing'],
                         'roles' => ['writer'],
                     ],
+                    [
+                        'allow' => true,
+                        'actions' => ['check-unsended'],
+                        'roles' => ['reader'],
+                    ],
                 ],
             ],
         ];

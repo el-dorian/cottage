@@ -37,12 +37,6 @@ class MyErrorHandler
             $errorInfo .= 'get is ';
             $errorInfo .= self::arrayToString($_GET);
         }
-        // Помещу данные об ошибке в файл
-        if (!is_dir($root . '/errors') && !mkdir($concurrentDirectory = $root . '/errors') && !is_dir($concurrentDirectory)) {
-            throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-        }
-        // пишу ошибки в файл только если учётка не админская
-        file_put_contents($root . '/errors/' . 'errors.txt', $errorInfo . "\r\n\r\n\r\n");
         // отправлю ошибки асинхронно
         //self::asyncSendErrors();
         if(!($e instanceof NotFoundHttpException)){

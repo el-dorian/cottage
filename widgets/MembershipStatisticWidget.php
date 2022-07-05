@@ -102,6 +102,10 @@ class MembershipStatisticWidget extends Widget
             </table>
         </div>
         <div class="clearfix"></div>
+        <div class="col-lg-6 text-center">
+            <button class="btn btn-default activator" data-action="/membership/more/<?=$this->quarterInfo->quarter?>"><span class="text-success">Подробности</span></button>
+        </div>
+        <div class="clearfix"></div>
         <?php
     }
 }
