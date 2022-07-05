@@ -30,6 +30,9 @@ class Filling extends Model
         $content = '';
         $info = ComplexPayment::getBillInfo($billInfo);
         $content .= self::getSingleRow('<p style="text-align: center">Счёт на оплату</p>');
+        if(!empty($info['billInfo']->comment)){
+            $content .= self::getSingleRow('<p style="text-align: center">'. $info['billInfo']->comment .'</p>');
+        }
         $content .= self::getRow('Идентификатор платежа', $info['billInfo']->id);
         $content .= self::getRow('Статус', $info['billInfo']->isPayed ? 'Оплачен' : 'Не оплачен', $info['billInfo']->isPayed ? Colors::COLOR_DATA : Colors::COLOR_WARNING);
         $content .= self::getRow('Дата выставления счёта', TimeHandler::getDatetimeFromTimestamp($info['billInfo']->creationTime), '');
