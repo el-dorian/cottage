@@ -4,22 +4,12 @@
 namespace app\controllers;
 
 
-use app\models\database\Accruals_membership;
-use app\models\database\Accruals_target;
-use app\models\database\Cottage;
 use app\models\database\Mail;
 use app\models\ExceptionWithStatus;
-use app\models\Fix;
-use app\models\interfaces\CottageInterface;
 use app\models\PenaltiesHandler;
-use app\models\Table_payed_membership;
-use app\models\Table_payed_power;
-use app\models\Table_payed_target;
-use app\models\Table_power_months;
 use app\models\Utils;
-use app\priv\Info;
-use COM;
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -27,7 +17,7 @@ use yii\web\Response;
 
 class UtilsController extends Controller
 {
-    public function behaviors(): array
+    #[ArrayShape(['access' => "array"])] public function behaviors(): array
     {
         return [
             'access' => [
@@ -49,6 +39,7 @@ class UtilsController extends Controller
                             'refresh-main-data',
                             'synchronize',
                             'backup-db',
+                            'fix',
                         ],
                         'roles' => ['writer'],
                     ],
@@ -63,17 +54,23 @@ class UtilsController extends Controller
         Yii::$app->response->xSendFile('post_addresses.xml');
     }
 
-    public function actionCountPenalties()
+    /**
+     * @throws Exception
+     */
+    public function actionCountPenalties(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return PenaltiesHandler::countPenalties();
     }
 
-    public function actionFix(): array
+    /**
+     * @throws Exception
+     */
+    #[ArrayShape(['status' => "int"])] public function actionFix(): array
     {
         // пофиксирую, если есть что
         Yii::$app->response->format = Response::FORMAT_JSON;
-        Fix::fix();
+        Utils::fillMembershipAccrualsForCottage(192);
         return ['status' => 1];
     }
 
@@ -90,7 +87,7 @@ class UtilsController extends Controller
      * @return array
      * @throws Exception
      */
-    public function actionFillMembershipAccruals(): array
+    #[ArrayShape(['status' => "int", 'header' => "string", 'data' => "string"])] public function actionFillMembershipAccruals(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         Utils::fillMembershipAccruals();
@@ -101,7 +98,7 @@ class UtilsController extends Controller
      * @return array
      * @throws Exception
      */
-    public function actionFillTargetAccruals(): array
+    #[ArrayShape(['status' => "int", 'header' => "string", 'data' => "string"])] public function actionFillTargetAccruals(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         Utils::fillTargetAccruals();
@@ -112,7 +109,7 @@ class UtilsController extends Controller
      * @return array
      * @throws ExceptionWithStatus
      */
-    public function actionDeleteTarget(): array
+    #[ArrayShape(['status' => "int", 'header' => "string", 'data' => "string"])] public function actionDeleteTarget(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         Utils::deleteTarget();
@@ -122,7 +119,7 @@ class UtilsController extends Controller
     /**
      * @return array
      */
-    public function actionRefreshMainData(): array
+    #[ArrayShape(['status' => "int", 'header' => "string", 'data' => "string"])] public function actionRefreshMainData(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         Utils::startRefreshMainData();
