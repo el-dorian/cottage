@@ -19,6 +19,12 @@ class GrammarHandler extends Model
     public const REGISTRIATION_INFO_PRESET = '%REGINFO%';
     public const DUTY_INFO_PRESET = '%DUTYINFO%';
 
+    public static function handleCounterData(int $current_counter_indication): string
+    {
+        return round($current_counter_indication / 10, 1) . ' кВт⋅ч';
+    }
+
+
     public static function normalizePhone($phone)
     {
         if (preg_match('/^(\+?\d).*(\d{3}).*(\d{3}).*(\d{2}).*(\d{2})$/', $phone, $matches)) {
@@ -183,9 +189,9 @@ class GrammarHandler extends Model
         return (int)$id;
     }
 
-    public static function convertToUTF($text)
+    public static function convertToUTF($text): string
     {
-        return $text;
+        return mb_convert_encoding($text, "UTF-8", "CP-1251");
     }
 
     public static function insertLexemes(string $text, Mail $email, Table_cottages $cottageInfo)

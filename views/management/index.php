@@ -14,7 +14,9 @@ ManagementAsset::register($this);
 ShowLoadingAsset::register($this);
 
 $this->title = 'Всякие разные настройки';
+
 ?>
+
 
 <ul class="nav nav-tabs">
     <li id="bank_set_li" class="active"><a href="#global_actions" data-toggle="tab" class="active">Обшие действия</a>
@@ -35,6 +37,8 @@ $this->title = 'Всякие разные настройки';
                             class="text-info">Заполнить данные по членским взносам</span></button>
                 <button class="btn btn-default activator" data-action="/utils/fill-target-accruals"><span
                             class="text-info">Заполнить данные по целевым взносам</span></button>
+                <button class="btn btn-default activator" data-action="/utils/fix"><span
+                            class="text-info">Fix</span></button>
             </div>
         </div>
     </div>

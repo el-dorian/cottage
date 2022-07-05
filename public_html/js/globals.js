@@ -262,25 +262,6 @@ function handleUnsended(e) {
             checkMessages();
         }
     }
-    if (e['errorsStatus'] && e['errorsStatus'] === 1) {
-        // найдены сообщения об ошибках, которые нужно отправить мне на почту
-        // noinspection JSValidateTypes
-        navbar.prepend('<li id="unsendedErrorsButton"><a href="#" id="sendErrorsButton" type="button" class="btn btn-warning btn-lg" data-toggle="tooltip" data-placement="bottom" title="Найдены ошибки. Нажмите, чтобы отправить их мне."><span class="glyphicon glyphicon-bell text-default"></span></a></li>');
-        $('a#sendErrorsButton').tooltip().on('click.send', function (e) {
-            e.preventDefault();
-            sendAjax('post', '/errors/send', callbackE);
-        });
-
-        function callbackE(data) {
-            if (data === '0') {
-                $('li#unsendedErrorsButton').remove();
-                makeInformer('success', 'Успешно', 'Ошибки успешно отправлены');
-            } else {
-                makeInformer('warning', 'Неудача', 'Не удалось отправить сообщение. Возможно, вы используете нестабильное подключение к интернету. Попробуйте ещё раз позднее.');
-            }
-            checkMessages();
-        }
-    }
 }
 
 

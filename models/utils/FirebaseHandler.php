@@ -9,6 +9,7 @@ use app\models\database\Accruals_target;
 use app\models\database\FirebaseDeviceBinding;
 use app\models\database\Notifications;
 use app\models\interfaces\CottageInterface;
+use app\models\interfaces\TransactionsInterface;
 use app\models\Table_payment_bills;
 use app\models\Table_power_months;
 use app\models\Table_tariffs_target;
@@ -60,7 +61,7 @@ class FirebaseHandler
         }
     }
 
-    public function sendNewTransactionConfirmedNotification(Table_transactions $transaction): void
+    public function sendNewTransactionConfirmedNotification(TransactionsInterface $transaction): void
     {
         $messageTitle = 'Оплата зарегистрирована';
         $messageText = "Зарегистрирована оплата на сумму $transaction->transactionSumm руб. по счёту №$transaction->billId. Спасибо!";
