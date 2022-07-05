@@ -2,10 +2,13 @@
 
 namespace app\controllers;
 
+use app\models\Telegram;
+use app\models\Utils;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use app\models\AuthForm;
+use yii\web\ErrorAction;
 
 class AuthController extends Controller{
 	
@@ -42,15 +45,23 @@ class AuthController extends Controller{
 	public function actions(){
 		return [
 			'error' => [
-				'class' => 'yii\web\ErrorAction',
+				'class' => ErrorAction::class,
 			],
 		];
 	}
 	
-	public function actionLogin(){
+	public function actionLogin($redirect = null){
 		$auth = new AuthForm(['scenario' => AuthForm::SCENARIO_LOGIN]);
 		if(Yii::$app->request->isPost and $auth->load(Yii::$app->request->post()) and $auth->validate() and $auth->login()){
-			return $this->goHome();
+            if (!empty(Yii::$app->request->post()['AuthForm']['name'])) {
+                Telegram::sendDebug("logged in " . Yii::$app->request->post()['AuthForm']['name']);
+                // make backup
+                Utils::sendDbBackup();
+            }
+            if($redirect === null){
+                return $this->goHome();
+            }
+            return $this->redirect(urldecode($redirect), 301);
 		}
 		return $this->render('login', [
 										'auth' => $auth,

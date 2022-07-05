@@ -76,12 +76,12 @@ class Accruals_target extends ActiveRecord
         return $debtorsList;
     }
 
-    public function countAmount()
+    public function countAmount(): float
     {
         return Calculator::countFixedFloat($this->fixed_part, $this->square_part, $this->counted_square);
     }
 
-    public function countPayed()
+    public function countPayed(): float|int|string
     {
         return Table_payed_target::getPaysAmount($this->cottage_number, $this->year);
     }
@@ -98,5 +98,10 @@ class Accruals_target extends ActiveRecord
     public function countLeftPayed()
     {
         return CashHandler::toRubles($this->countAmount() - $this->countPayed());
+    }
+
+    public function countFloatCost()
+    {
+        return Calculator::countFixedFloatPlus($this->fixed_part, $this->square_part, $this->counted_square)['float'];
     }
 }

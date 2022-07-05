@@ -79,4 +79,19 @@ class Accruals_membership extends ActiveRecord
         }
         return $result;
     }
+
+    public function countAmount()
+    {
+        return Calculator::countFixedFloat($this->fixed_part, $this->square_part, $this->counted_square);
+    }
+
+    public function countPayed()
+    {
+        return Table_payed_membership::getPaysAmount($this->cottage_number, $this->quarter);
+    }
+
+    public function countFloatCost(): float
+    {
+        return Calculator::countFixedFloatPlus($this->fixed_part, $this->square_part, $this->counted_square)['float'];
+    }
 }

@@ -84,7 +84,7 @@ class AuthForm extends Model{
      * @return bool whether the user is logged in successfully
      */
     public function login(){
-        return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
+        return Yii::$app->user->login($this->getUser(),  0);
     }
     /* 	public function signup(){
             $password = Yii::$app->getSecurity()->generateRandomString(10);

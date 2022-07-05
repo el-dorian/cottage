@@ -85,7 +85,7 @@ $double = !empty($info['cottageInfo']->hasDifferentOwner);
             if ($info['billInfo']->isPartialPayed === 1) {
                 ?>
                 <tr>
-                    <td>Сумма частичной оплаты:</td>
+                    <td>Оплачено ранее:</td>
                     <td><b class='text-info'><?= CashHandler::toSmoothRubles($info['billInfo']->payedSumm) ?></b></td>
                 </tr>
                 <?php
@@ -135,6 +135,7 @@ $double = !empty($info['cottageInfo']->hasDifferentOwner);
             try {
                 echo TransactionsDetailsWidget::widget(['info' => $billTransactions]);
             } catch (Exception $e) {
+                echo $e->getMessage();
             }
         }
         ?>

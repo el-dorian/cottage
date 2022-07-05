@@ -41,7 +41,8 @@
     "ext-calendar": "*",
     "ext-mbstring": "*",
     "telegram-bot/api": "^2.3",
-    "onmotion/yii2-widget-apexcharts": "*"
+    "onmotion/yii2-widget-apexcharts": "*",
+    "kartik-v/yii2-widget-depdrop": "dev-master"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",

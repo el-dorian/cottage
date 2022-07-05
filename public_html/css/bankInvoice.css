@@ -1,34 +1,45 @@
-div#invoiceWrapper{
-     width: 180mm;
-     margin: auto;
-     font-size: 10px;
- }
-td.leftSide{
+div#invoiceWrapper {
+    width: 180mm;
+    margin: auto;
+    font-size: 10px;
+}
+
+td.leftSide {
     text-align: center;
     width: 65mm;
     border-right: 1px solid black;
 }
-img.qr-img{
+
+img.qr-img {
     width: 80%;
 }
-.bottom-bordered{
+
+.bottom-bordered {
     border-bottom: 1px solid black;
 }
-.description{
+
+.description {
     font-size: 8px;
 }
 
-.text-underline{
+.text-underline {
 }
-.margened{
+
+.margened {
     margin-bottom: 10px;
 }
-.sign-span{
+
+.sign-span {
     width: 20mm;
     display: inline-block;
 }
-img.logo-img{
+
+img.logo-img {
     margin-top: 30px;
     width: 30%;
     float: right;
+}
+
+.page-break {
+    page-break-after: always;
 }

@@ -348,7 +348,10 @@ class ComplexPayment extends Model
         $content['additionalTarget'] = self::getPaymentPart($dom, $xpath, 'additional_target', 'pay');
         $content['single'] = self::getPaymentPart($dom, $xpath, 'single', 'pay');
         $content['fines'] = Table_view_fines_info::find()->where(['bill_id' => $bill->id])->all();
-        $summToPay = $bill->totalSumm - $bill->discount - $bill->depositUsed - $bill->payedSumm;
+        $summToPay = $bill->totalSumm - $bill->discount - $bill->depositUsed - $bill->payedSumm + $bill->toDeposit;
+        if($summToPay < 0){
+            $summToPay = 0;
+        }
         return ['billInfo' => $bill, 'cottageInfo' => $cottageInfo, 'payInfo' => $payInfo, 'payedSumm' => $bill->payedSumm, 'summToPay' => $summToPay, 'paymentContent' => $content];
     }
 
@@ -386,9 +389,9 @@ class ComplexPayment extends Model
                 } elseif (!empty($item->depositUsed) || !empty($item->discount)) {
                     $payedSumm = CashHandler::rublesMath(CashHandler::toRubles($item->depositUsed) + CashHandler::toRubles($item->discount));
                 } else {
-                    $payedSumm = '';
+                    $payedSumm = 0;
                 }
-                $paymentsInfo[] = ['id' => $item->id, 'isPartialPayed' => $item->isPartialPayed, 'isPayed' => $item->isPayed, 'creationTime' => TimeHandler::getDatetimeFromTimestamp($item->creationTime), 'paymentTime' => $pt, 'summ' => CashHandler::toRubles($item->totalSumm), 'payed-summ' => $payedSumm, 'from-deposit' => $item->depositUsed, 'discount' => $item->discount, 'double' => $double];
+                $paymentsInfo[] = ['id' => $item->id, 'dividedSum' => CashHandler::toRubles($item->payedSumm), 'isPartialPayed' => $item->isPartialPayed, 'isPayed' => $item->isPayed, 'creationTime' => TimeHandler::getDatetimeFromTimestamp($item->creationTime), 'paymentTime' => $pt, 'summ' => CashHandler::toRubles($item->totalSumm), 'payed-summ' => CashHandler::toRubles($payedSumm), 'from-deposit' => $item->depositUsed, 'discount' => $item->discount, 'double' => $double];
             }
             return $paymentsInfo;
         }

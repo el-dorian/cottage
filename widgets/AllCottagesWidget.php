@@ -13,7 +13,7 @@ class AllCottagesWidget extends Widget{
      * @var $info Filling
      */
     public $info;
-    private $cottagesQuantity = 180;
+    private $cottagesQuantity = 192;
     public $content = '';
 
     /**

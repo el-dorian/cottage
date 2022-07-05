@@ -227,7 +227,7 @@ $text = "
 <div class='description margened'><span>(инн получателя платежа)</span><span class='pull-right'>(номер счёта получателя платежа)</span></div>
 <div class='bottom-bordered text-center'><span><b>БИК</b> {$bankInfo->bik} ({$bankInfo->bankName})</span></div>
 <div class='text-center description margened'><span>(Наименование банка получателя платежа)</span></div>
-<div class='bottom-bordered text-underline'><b>Участок </b>№{$bankInfo->cottageNumber};<b> ФИО:</b> {$bankInfo->lastName}; <b>Назначение:</b> {$bankInfo->purpose};</b></div>
+<div class='bottom-bordered text-underline'><b>Участок </b>№{$bankInfo->cottageNumber};<b> ФИО:</b> {$bankInfo->lastName}; <b>Назначение:</b> {$bankInfo->purpose}" . ($payInfo->comment ?: '') . ";</b></div>
 <div class='description margened text-center'><span>(назначение платежа)</span></div>
 <div class='text-center bottom-bordered'><b>Сумма: {$smoothSumm}</b></div>
 <div class='description margened text-center'><span>(сумма платежа)</span></div>
@@ -278,6 +278,8 @@ BankInvoiceAsset::register($this);
 
     <div>
         <h4>Детализация платежа по счёту №<?= $payInfo->id . ($info['double'] ? '-a' : '') ?></h4>
+        <?= $payInfo->payUpDate ? '<h3 class="text-center">Срок оплаты: до ' . TimeHandler::getDatetimeFromTimestamp($payInfo->payUpDate) . '</h3>': '' ?>
+        <?= '<h3 class="text-center">' . ($payInfo->comment ?: '') . '</h3>'?>
         <?= $powerText ?>
         <?= $memText ?>
         <?= $tarText ?>
@@ -285,6 +287,7 @@ BankInvoiceAsset::register($this);
         <?= $finesText ?>
         <?= $depositText ?>
         <?= $discountText ?>
+        <?=  $payInfo->comment ?: '' ?>
     </div>
 </div>
 <?php $this->endBody() ?>
