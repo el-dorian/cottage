@@ -25,7 +25,7 @@ class SearchCottages extends Search {
 
 	public function __construct(array $config = []){
 		parent::__construct($config);
-		$info = Table_Columns::find()->where(['TABLE_SCHEMA' => 'cottage', 'TABLE_NAME' => 'cottages'])->select(['COLUMN_COMMENT', 'COLUMN_NAME', 'DATA_TYPE'])->all();
+		$info = Table_Columns::find()->where(['TABLE_SCHEMA' => 'u1025225mf_snt', 'TABLE_NAME' => 'cottages'])->select(['COLUMN_COMMENT', 'COLUMN_NAME', 'DATA_TYPE'])->all();
 		if(!empty($info)){
 			foreach ($info as $item){
 				$this->options[$item->COLUMN_NAME] = ['comment' => $item->COLUMN_COMMENT, 'type' => $item->DATA_TYPE];

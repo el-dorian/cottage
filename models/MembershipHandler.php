@@ -14,6 +14,7 @@ use app\models\database\CottageSquareChanges;
 use app\models\interfaces\CottageInterface;
 use app\models\selections\FixedFloatTariff;
 use app\models\selections\MembershipDebt;
+use app\models\selections\MembershipInfo;
 use DOMElement;
 use Exception;
 use yii\base\InvalidArgumentException;
@@ -257,6 +258,7 @@ class MembershipHandler extends Model
                 if ($quarter !== null) {
                     $lastQuarter = $quarter->quarter;
                     $accrued = Calculator::countFixedFloat($quarter->fixed_part, $quarter->square_part, $quarter->counted_square);
+
                     if ($accrued > 0) {
                         // посчитаю оплаты
                         $pays = self::getPaysForPeriod($cottageInfo, $quarter->quarter);
@@ -313,6 +315,23 @@ class MembershipHandler extends Model
         return $debt;
     }
 
+    public static function getQuarterStatistics($quarter)
+    {
+        $answer = [];
+
+        $accrualsData = Accruals_membership::findAll(['quarter' => $quarter]);
+        if (!empty($accrualsData)) {
+            foreach ($accrualsData as $accrual) {
+                $info = new MembershipInfo();
+                $info->cottageNumber = $accrual->cottage_number;
+                $info->amount = $accrual->countAmount();
+                $info->payed = $accrual->countPayed();
+                $answer[] = $info;
+            }
+        }
+        return $answer;
+    }
+
 
     public function scenarios(): array
     {
@@ -334,31 +353,24 @@ class MembershipHandler extends Model
             // если дополнительный участок не оплачивает членские взносы
             return $result;
         }
-        // получу список кварталов, начиная от первого неоплаченного до текущего
-        $list = TimeHandler::getQuarterList(self::getLastPayedQuarter($cottage));
-        if (empty($list)) {
-            return $result;
-        }
-        foreach ($list as $key => $value) {
-            $accrual = Accruals_membership::findOne(['cottage_number' => $cottage->getCottageNumber(), 'quarter' => $key]);
-            if ($accrual !== null) {
-                $existentTariff = Table_tariffs_membership::findOne(['quarter' => $key]);
-                // получу значение начисления по кварталу
-                $payedYet = 0;
-                // если квартал частично оплачен- вычту сумму частичной оплаты из цены
-                if ($isMain) {
-                    $pays = Table_payed_membership::findAll(['cottageId' => $cottage->cottageNumber, 'quarter' => $key]);
-                } else {
-                    $pays = Table_additional_payed_membership::findAll(['cottageId' => $cottage->masterId, 'quarter' => $key]);
+        $accruals = Accruals_membership::find()->where(['cottage_number' => $cottage->getCottageNumber()])->all();
+        foreach ($accruals as $accrual) {
+            // получу значение начисления по кварталу
+            $payedYet = 0;
+            $existentTariff = Table_tariffs_membership::find()->where(['quarter' => $accrual->quarter])->one();
+            // если квартал частично оплачен-вычту сумму частичной оплаты из цены
+            if ($isMain) {
+                $pays = Table_payed_membership::findAll(['cottageId' => $cottage->cottageNumber, 'quarter' => $accrual->quarter]);
+            } else {
+                $pays = Table_additional_payed_membership::findAll(['cottageId' => $cottage->masterId, 'quarter' => $accrual->quarter]);
+            }
+            if (!empty($pays)) {
+                foreach ($pays as $pay) {
+                    $payedYet = CashHandler::toRubles($payedYet + $pay->summ);
                 }
-                if (!empty($pays)) {
-                    foreach ($pays as $pay) {
-                        $payedYet = CashHandler::toRubles($payedYet + $pay->summ);
-                    }
-                }
-                if ($payedYet < $accrual->getAccrual()) {
-                    $result[] = new MembershipDebt(['partialPayed' => $payedYet, 'amount' => Calculator::countFixedFloat($accrual->fixed_part, $accrual->square_part, $accrual->counted_square), 'quarter' => $key, 'tariffFixed' => $accrual->fixed_part, 'tariffFloat' => $accrual->square_part, 'tariff' => $existentTariff]);
-                }
+            }
+            if ($payedYet < $accrual->getAccrual()) {
+                $result[] = new MembershipDebt(['partialPayed' => $payedYet, 'amount' => Calculator::countFixedFloat($accrual->fixed_part, $accrual->square_part, $accrual->counted_square), 'quarter' => $accrual->quarter, 'tariffFixed' => $accrual->fixed_part, 'tariffFloat' => $accrual->square_part, 'tariff' => $existentTariff]);
             }
         }
         return $result;
@@ -392,7 +404,7 @@ class MembershipHandler extends Model
             if ($accrual !== null) {
                 // получу значение начисления по кварталу
                 $payedYet = 0;
-                // если квартал частично оплачен- вычту сумму частичной оплаты из цены
+                // если квартал частично оплачен-вычту сумму частичной оплаты из цены
                 if ($cottage->isMain()) {
                     $pays = Table_payed_membership::findAll(['cottageId' => $cottage->cottageNumber, 'quarter' => $key]);
                 } else {
