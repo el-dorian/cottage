@@ -39,6 +39,13 @@ class MailController extends Controller
                         ],
                         'roles' => ['writer'],
                     ],
+                    [
+                        'allow' => true,
+                        'actions' => [
+                            'get-unsended-messages-count',
+                        ],
+                        'roles' => ['reader'],
+                    ],
                 ],
             ],
         ];

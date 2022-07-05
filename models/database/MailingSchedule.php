@@ -11,6 +11,7 @@ use app\models\MailSettings;
 use app\models\PDFHandler;
 use app\models\Report;
 use app\models\Table_cottages;
+use app\models\Telegram;
 use app\models\utils\Email;
 use Exception;
 use Throwable;
@@ -70,7 +71,7 @@ class MailingSchedule extends ActiveRecord
      * @param $identificator
      * @return array
      */
-    public static function addBankInvoiceSending($identificator, $double = false): array
+    public static function addBankInvoiceSending($identificator, $double = false, $skipSend = false): array
     {
         // получу информацию о счёте
         $billInfo = BillsHandler::getBill($identificator, $double);
@@ -86,7 +87,7 @@ class MailingSchedule extends ActiveRecord
                     $result = ['schedule' => $schedule, 'mail' => $mail];
                     $inQueue[] = $result;
                 }
-                if (!empty($inQueue)) {
+                if (!empty($inQueue) && !$skipSend) {
                     /** @var MailingSchedule $item */
                     foreach ($inQueue as $item) {
                         // попытаюсь отправить все сообщения
@@ -136,11 +137,12 @@ class MailingSchedule extends ActiveRecord
             if (!empty($inQueue)) {
                 /** @var MailingSchedule $item */
                 foreach ($inQueue as $item) {
+                    $mailBody = $body;
                     // попытаюсь отправить все сообщения
                     try {
-                        $body = Yii::$app->controller->renderPartial('/mail/simple_template', ['text' => GrammarHandler::insertLexemes(urldecode($body), $item['mail'], $cottageInfo)]);
+                        $mailBody = Yii::$app->controller->renderPartial('/mail/simple_template', ['text' => GrammarHandler::insertLexemes(urldecode($mailBody), $item['mail'], $cottageInfo)]);
                         $email = new Email();
-                        $email->setBody($body);
+                        $email->setBody($mailBody);
                         $email->setSubject($subject);
                         $email->setFrom(MailSettings::getInstance()->address);
                         $email->setAddress(MailSettings::getInstance()->is_test ? MailSettings::getInstance()->test_mail : $item['mail']->email);

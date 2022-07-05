@@ -92,8 +92,15 @@ use app\priv\Info;
             </p>
             <p>
                 Официальная группа ВКонтакте: <a target='_blank' href='<?= Info::VK_GROUP_URL ?>'>Посетить</a><br/>
-                e-mail: <a href='mailto:<?= Info::MAIL_ADDRESS ?>'>Написать</a>
+                e-mail: <a href='mailto:<?= Info::CONTACT_MAIL_ADDRESS ?>'>Написать</a>
             </p>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <h4 class="text-center">Данное письмо сгенерировано автоматически. Не отвечайте на него</h4>
+            <h4 class="text-center">Для связи с нами используйте адрес <a
+                        href='mailto:<?= Info::CONTACT_MAIL_ADDRESS ?>'><?= Info::CONTACT_MAIL_ADDRESS ?></a></h4>
         </td>
     </tr>
     </tbody>
