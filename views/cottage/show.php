@@ -3,8 +3,10 @@
 use app\assets\CottageAsset;
 use app\models\CashHandler;
 use app\models\Cottage;
+use app\models\database\EmergencyCottageInfo;
 use app\models\database\Mail;
 use app\models\DOMHandler;
+use app\models\exceptions\InvalidParamException;
 use app\models\GrammarHandler;
 use app\models\MembershipHandler;
 use app\models\PowerHandler;
@@ -15,6 +17,7 @@ use app\models\Table_power_months;
 use app\models\tables\Table_penalties;
 use app\models\TargetHandler;
 use app\models\TimeHandler;
+use app\models\utils\RawDataHandler;
 use nirvana\showloading\ShowLoadingAsset;
 use yii\helpers\Url;
 use yii\web\View;
@@ -37,6 +40,29 @@ if (Reminder::requreRemind()) {
 $totalDebt = 0;
 
 $totalDebt += $cottageInfo->powerDebts;
+
+$emergencyCottageInfo = EmergencyCottageInfo::find()->where(['cottage_number' =>  $cottageInfo->globalInfo->cottageNumber])->one();
+if($emergencyCottageInfo !== null){
+    $currentElectricityConsumption = $emergencyCottageInfo->current_counter_indication;
+    $currentElectricityConsumption = GrammarHandler::handleCounterData($currentElectricityConsumption);
+    $indicationTime = "";
+    try {
+        $newParsedInfo = new RawDataHandler($emergencyCottageInfo->last_raw_data);
+        $indicationTime = " (" . TimeHandler::timestampToDateTime($newParsedInfo->indicationTime) . ")";
+        $pinValue = "pin_{$emergencyCottageInfo->channel}_value";
+        try {
+            $val = $newParsedInfo->$pinValue + $emergencyCottageInfo->initial_value;
+            $currentElectricityConsumption = GrammarHandler::handleCounterData($val * 10);
+        }
+        catch (Throwable $t){}
+
+    } catch (InvalidParamException $e) {
+    }
+}
+else{
+    $currentElectricityConsumption = "Не удалось определить";
+    $indicationTime = "";
+}
 
 
 $this->title = 'Участок № ' . $cottageInfo->globalInfo->cottageNumber;
@@ -83,6 +109,10 @@ $registrationNumber = $cottageInfo->globalInfo->cottageRegistrationInformation ?
                        data-action="<?= Url::toRoute(['forms/power', 'cottageId' => $cottageInfo->globalInfo->cottageNumber]) ?>">Электроэнергия</a>
                 </td>
                 <td><?= $cottageInfo->powerDebts > 0 ? "<a class='btn btn-default detail-debt' data-type='power' href='#'><b class='text-danger'>Задолженность " . CashHandler::toSmoothRubles($cottageInfo->powerDebts) . '</b></a>' : "<b class='text-success'>Оплачено</b>" ?></td>
+            </tr>
+            <tr>
+                <td>Электроэнергия- показания на данный момент</td>
+                <td><?=$currentElectricityConsumption?> <?=$indicationTime?> </td>
             </tr>
             <tr>
                 <td>Электроэнергия- последний оплаченный месяц</td>
@@ -502,7 +532,7 @@ $registrationNumber = $cottageInfo->globalInfo->cottageRegistrationInformation ?
                 if ($differentOwner) {
                     echo '<li><a id="payForCottageButton" href="#">Оплатить</a></li>';
                     ?>
-                    <li><a id="buttonShowPaymentsStory" href="#">История платежей</a></li>
+                    <li><a class="buttonShowPaymentsStory" href="#">История платежей</a></li>
                     <li><a id="changeInfoButton" href="#">Изменить данные</a></li>
                     <br/>
                     <?php
@@ -575,7 +605,7 @@ $registrationNumber = $cottageInfo->globalInfo->cottageRegistrationInformation ?
                 <h2>Основные действия</h2>
                 <div class="btn-group-vertical">
                     <button id='payForCottageButton' class='btn btn-success'>Оплатить</button>
-                    <button id="buttonShowPaymentsStory" class="btn btn-default">История платежей</button>
+                    <button class="buttonShowPaymentsStory btn btn-default">История платежей</button>
                     <button id="changeInfoButton" class="btn btn-info">Изменить данные</button>
                 </div>
             </div>
