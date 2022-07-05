@@ -113,4 +113,15 @@ class Table_power_months extends ActiveRecord
         }
             return true;
     }
+
+    public function countAmount(): float
+    {
+        return CashHandler::toRubles($this->inLimitPay + $this->overLimitPay);
+    }
+
+    public function countPayed()
+    {
+        return Table_payed_power::getPaysAmount($this->cottageNumber, $this->month);
+
+    }
 }

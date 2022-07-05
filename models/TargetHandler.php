@@ -266,7 +266,7 @@ class TargetHandler extends Model
                     $info->amount = $accrual->countAmount();
                     $info->payed = $accrual->countPayed();
                 }
-                if ($info->amount != 0) {
+                if ($info->amount !== 0) {
                     $answer[] = $info;
                 }
                 if ($cottage->haveAdditional()) {
@@ -650,7 +650,7 @@ class TargetHandler extends Model
                 $fullPayed++;
             } else {
                 $partial = $yearDuty->getAttribute('payed');
-                if (!empty($partial) && CashHandler::rublesRound($partial) > 0) {
+                if (!empty($partial) && CashHandler::rublesRound(CashHandler::toRubles($partial)) > 0) {
                     $partialPayed++;
                 }
             }
