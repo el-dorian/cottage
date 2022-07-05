@@ -18,6 +18,7 @@ use app\models\Report;
 use app\models\Table_cottages;
 use app\models\TimeHandler;
 use app\models\utils\TotalDutyReport;
+use JetBrains\PhpStorm\ArrayShape;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -27,7 +28,7 @@ use yii\web\Response;
 
 class ReportController extends Controller
 {
-    public function behaviors(): array
+    #[ArrayShape(['access' => "array"])] public function behaviors(): array
     {
         return [
             'access' => [
