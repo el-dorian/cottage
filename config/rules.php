@@ -179,7 +179,10 @@ return [
     'search/accruals/<year:\d{4}>' => 'search/accruals',
     'bank-to-deposit' => 'payments/bank-to-deposit',
     'target/more/<year:\d+?>' => 'tariffs/target-more',
+    'membership/more/<quarter:\d+\-\d+?>' => 'tariffs/membership-more',
+    'power/more/<month:\d+\-\d+?>' => 'tariffs/power-more',
     'backup-db' => 'utils/backup-db',
     'download-db-backup' => 'site/download-db',
-    'utils/synchronize/<cottageNumber:\d+?>' => 'utils/synchronize'
+    'utils/synchronize/<cottageNumber:\d+?>' => 'utils/synchronize',
+    'accessError' => 'site/access-error',
 ];
