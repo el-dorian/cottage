@@ -21,10 +21,9 @@ use yii\db\ActiveRecord;
  * @property int $paymentDate [int(20) unsigned]
  * @property int $transactionId [int(10) unsigned]  Идентификатор транзакции
  */
-
 class Table_payed_power extends ActiveRecord
 {
-    public static function tableName():string
+    public static function tableName(): string
     {
         return 'payed_power';
     }
@@ -46,7 +45,7 @@ class Table_payed_power extends ActiveRecord
      */
     public static function getPayed(Table_power_months $dutyItem): ?array
     {
-        if($dutyItem !== null){
+        if ($dutyItem !== null) {
             return self::findAll(['month' => $dutyItem->month, 'cottageId' => $dutyItem->cottageNumber]);
         }
         return null;
@@ -59,5 +58,17 @@ class Table_payed_power extends ActiveRecord
     public static function getPayedInTransaction(int $id): array
     {
         return self::findAll(['transactionId' => $id]);
+    }
+
+    public static function getPaysAmount(int $cottageNumber, string $month): float
+    {
+        $result = 0;
+        $pays = self::findAll(['month' => $month, 'cottageId' => $cottageNumber]);
+        if (!empty($pays)) {
+            foreach ($pays as $pay) {
+                $result += $pay->summ;
+            }
+        }
+        return $result;
     }
 }

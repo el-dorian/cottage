@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Cottage;
 use app\models\database\MailingSchedule;
 use app\models\Fix;
+use app\models\Table_payment_bills;
 use app\models\TariffsKeeper;
 use app\models\Utils;
 use app\models\YaAuth;
@@ -37,10 +38,10 @@ class SiteController extends Controller
                             'index',
                             'error',
                             'auth',
-                            'mailing-schedule'
+                            'mailing-schedule',
+                            'access-error',
                         ],
                         'roles' => ['@'],
-
                     ],
                     [
                         'allow' => true,
@@ -108,7 +109,12 @@ class SiteController extends Controller
      */
     public function actionTest(): void
     {
-        Fix::fixAccruals();
+       /* $billsForSend = Table_payment_bills::find()->where(['>', "creationTime", 1653591397])->andWhere(['isPayed' => 0])->all();
+        foreach ($billsForSend as $bill){
+            MailingSchedule::addBankInvoiceSending($bill->id, false, true);
+        }*/
+        echo "done";
+        //Fix::fixAccruals();
 
     }
 
@@ -130,5 +136,10 @@ class SiteController extends Controller
         $date = new DateTime();
         $d = $date->format('Y-m-d H:i:s');
         Yii::$app->response->sendFile($path, "Резервная копия базы данных СНТ $d.sql");
+    }
+
+    public function actionAccessError()
+    {
+        return $this->render('access-error');
     }
 }

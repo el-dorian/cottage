@@ -34,6 +34,8 @@ use yii\db\ActiveRecord;
  * @property bool $isMessageSend [tinyint(1)]  Уведомление отправлено
  * @property bool $isInvoicePrinted [tinyint(1)]  Квитанция распечатана
  * @property string $payer_personals [varchar(255)]  Имя плательщика
+ * @property string $comment
+ * @property int $payUpDate [int(10) unsigned]
  */
 class Table_payment_bills extends ActiveRecord
 {
@@ -98,7 +100,7 @@ class Table_payment_bills extends ActiveRecord
             $t->billId = $billInfo->id;
             $t->transactionDate = $billInfo->paymentTime;
             $t->transactionType = 'no-cash';
-            $t->transactionSumm = $requiredAmount;
+            $t->transactionSumm = 0;
             $t->usedDeposit = $requiredAmount;
             $t->transactionWay = 'in';
             $t->transactionDate = time();
@@ -113,7 +115,8 @@ class Table_payment_bills extends ActiveRecord
 
             $billInfo->paymentTime = time();
             $billInfo->isPayed = true;
-            $billInfo->payedSumm = $requiredAmount;
+            $billInfo->payedSumm = 0;
+            $billInfo->save();
 
             // обработаю отдельные категории
             // электричество

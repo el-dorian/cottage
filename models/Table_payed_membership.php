@@ -31,12 +31,30 @@ class Table_payed_membership extends ActiveRecord
         return 'payed_membership';
     }
 
-    public static function getPays(CottageInterface $cottage, string $period){
+    public static function getPays(CottageInterface $cottage, string $period): array
+    {
         if($cottage->isMain()){
             return self::findAll(['quarter' => $period, 'cottageId' => $cottage->getCottageNumber()]);
         }
         return Table_additional_payed_membership::findAll(['quarter' => $period, 'cottageId' => $cottage->getCottageNumber()]);
 
+    }
+
+    public static function getPaysAmount(string $cottage_number, string $quarter)
+    {
+        $result = 0;
+        if(GrammarHandler::isMain($cottage_number)){
+            $pays = self::findAll(['quarter' => $quarter, 'cottageId' => $cottage_number]);
+        }
+        else{
+            $pays = Table_additional_payed_membership::findAll(['quarter' => $quarter, 'cottageId' => $cottage_number]);
+        }
+        if(!empty($pays)){
+            foreach ($pays as $pay) {
+                $result += $pay->summ;
+            }
+        }
+        return $result;
     }
 
     /**
