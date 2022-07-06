@@ -942,6 +942,26 @@ function handleAjaxActivators() {
             )
         }
     });
+    // найду активаторы AJAX-запросов
+    let postTriggers = $('.ajax-post-trigger');
+    postTriggers.off('click.request');
+    postTriggers.on('click.request', function () {
+        let action = $(this).attr('data-action');
+        if (action) {
+            // отправлю запрос на форму
+            sendAjax(
+                "post",
+                action,
+                simpleAnswerHandler
+            )
+        } else {
+            makeInformer(
+                "danger",
+                "Ошибка",
+                "Кнопке не назначено действие"
+            )
+        }
+    });
 }
 
 function handleTooltipEnabled() {

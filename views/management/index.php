@@ -2,12 +2,16 @@
 
 use app\assets\ManagementAsset;
 use app\models\MailSettings;
+use app\models\personal_area\AddGardenerModel;
+use app\models\User;
+use app\widgets\ShowUsersWidget;
 use nirvana\showloading\ShowLoadingAsset;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $mailSettings MailSettings */
+/* @var $addGardenerModel AddGardenerModel */
 /* @var $dbRestore \app\models\utils\DbRestore */
 
 ManagementAsset::register($this);
@@ -23,6 +27,11 @@ $this->title = 'Всякие разные настройки';
     </li>
     <li><a href="#email_set" data-toggle="tab">Настройки почты</a></li>
     <li><a href="#db_options" data-toggle="tab">База данных</a></li>
+    <?php
+    if (Yii::$app->user->can('manage')) {
+        echo '<li><a href="#users_options" data-toggle="tab">Пользователи</a></li>';
+    }
+    ?>
 </ul>
 
 <div class="tab-content">
@@ -102,4 +111,32 @@ $this->title = 'Всякие разные настройки';
         ActiveForm::end();
         ?>
     </div>
+    <?php
+    if (Yii::$app->user->can('manage')) {
+        ?>
+        <div class="tab-pane margened" id="users_options">
+            <?php
+            $form = ActiveForm::begin(['id' => 'addGardenerForm', 'options' => ['class' => 'form-horizontal bg-default', 'enctype' => 'multipart/form-data'], 'enableAjaxValidation' => true, 'validateOnSubmit' => true, 'action' => ['/personal-area/add-gardener']]);
+            try {
+                echo $form->field($addGardenerModel, 'cottageNumber', ['template' =>
+                    '<div class="col-sm-offset-4 col-sm-4 col-xs-12"><div class="input-group">{input}<span class="input-group-btn"><button type="submit" class="btn btn-success">Зарегистрировать</button></span></div>{error}{hint}</div>', 'inputOptions' =>
+                    ['class' => 'form-control', 'tabindex' => '1']])
+                    ->textInput(['autocomplete' => 'off', 'focus' => true])
+                    ->hint('номер участка');
+            } catch (Exception $e) {
+            }
+            ActiveForm::end();
+
+            $registeredUsers = User::find()->all();
+            try {
+                echo ShowUsersWidget::widget(['users' => $registeredUsers]);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+                echo $e->getTraceAsString();
+            }
+            ?>
+        </div>
+        <?php
+    }
+    ?>
 </div>

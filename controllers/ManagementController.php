@@ -10,6 +10,7 @@ namespace app\controllers;
 
 use app\models\Cloud;
 use app\models\MailSettings;
+use app\models\personal_area\AddGardenerModel;
 use app\models\utils\DbRestore;
 use JetBrains\PhpStorm\ArrayShape;
 use Yii;
@@ -48,23 +49,24 @@ class ManagementController extends Controller
      */
     public function actionIndex(): string
     {
-        // если переданы данные постом- это бекап базы данных
+        // если переданы данные постом-это бекап базы данных
         if(Yii::$app->request->isPost){
             $restoreModel = new DbRestore();
             $restoreModel->file = UploadedFile::getInstance($restoreModel, 'file');
             $restoreModel->restore();
         }
-
+        $addGardenerModel = new AddGardenerModel();
         $mailSettings = MailSettings::getInstance();
         $dbRestore = new DbRestore();
-        return $this->render('index', ['mailSettings' => $mailSettings, 'dbRestore' => $dbRestore]);
+        return $this->render('index', ['mailSettings' => $mailSettings, 'dbRestore' => $dbRestore, 'addGardenerModel' => $addGardenerModel]);
     }
 
     /**
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionSendBackup(): array
+
+    #[ArrayShape(['status' => "int"])] public function actionSendBackup(): array
     {
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;

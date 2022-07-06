@@ -52,8 +52,7 @@ class AuthForm extends Model{
             // password is validated by validatePassword()
             ['password', 'validatePassword'],
             ['name', 'validateUniqueName', 'on' => self::SCENARIO_SIGNUP],
-            ['name', 'string', 'min' => 3, 'max' => 100],
-            ['name', 'match', 'pattern' => '/^[a-z]*$/iu'],
+            ['name', 'string', 'min' => 1, 'max' => 100],
             ['password', 'string', 'min' => 1,],
         ];
     }
