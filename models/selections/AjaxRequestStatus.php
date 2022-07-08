@@ -23,7 +23,7 @@ class AjaxRequestStatus
 
     #[ArrayShape(['status' => "int", 'title' => "string", 'view' => "string", 'delay' => "false"])] public static function view(string $title, string $view): array
     {
-        return ['status' => self::STATUS_SUCCESS, 'title' => $title, 'view' => $view, 'delay' => false];
+        return ['status' => self::STATUS_SUCCESS, 'title' => $title, 'view' => $view, 'delay' => true];
     }
 
     #[ArrayShape(['status' => "int", 'message' => "string", 'reload' => "bool"])] public static function successAndReload(string $message): array

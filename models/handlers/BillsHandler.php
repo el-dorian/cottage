@@ -6,6 +6,7 @@ namespace app\models\handlers;
 
 use app\models\Cottage;
 use app\models\database\Bill;
+use app\models\database\MailingSchedule;
 use app\models\DOMHandler;
 use app\models\PowerHandler;
 use app\models\Table_additional_cottages;
@@ -14,6 +15,7 @@ use app\models\Table_cottages;
 use app\models\Table_payment_bills;
 use app\models\Table_payment_bills_double;
 use app\models\Table_power_months;
+use app\models\Telegram;
 use DOMElement;
 use yii\base\Model;
 
@@ -86,5 +88,16 @@ class BillsHandler extends Model
             return Table_payment_bills_double::findOne((int)$identificator);
         }
         return Table_payment_bills::findOne($identificator);
+    }
+
+    public static function resend()
+    {
+        $bills = Table_payment_bills::find()->where(['>', 'id', 5581])->all();
+        if(!empty($bills)){
+            foreach ($bills as $bill) {
+                MailingSchedule::addBankInvoiceSending($bill->id, $bill instanceof Table_payment_bills_double, true);
+            }
+            Telegram::sendDebug('done');
+        }
     }
 }

@@ -1,0 +1,5 @@
+
+$(function () {
+    enableTabNavigation();
+    handleAjaxActivators();
+});

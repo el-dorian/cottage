@@ -10,6 +10,8 @@ namespace app\controllers;
 
 use app\models\personal_area\AddGardenerModel;
 use app\models\selections\AjaxRequestStatus;
+use app\models\Table_payment_bills;
+use app\models\Table_transactions;
 use app\models\User;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
@@ -41,6 +43,13 @@ class PersonalAreaController extends Controller
                             'delete',
                         ],
                         'roles' => ['manager'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => [
+                            'get-bill-info'
+                        ],
+                        'roles' => ['beholder'],
                     ],
                 ],
             ],
@@ -100,11 +109,31 @@ class PersonalAreaController extends Controller
         if (Yii::$app->request->isAjax && Yii::$app->request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             try {
-                $newPass = User::deleteBeholder($id);
+                User::deleteBeholder($id);
                 return AjaxRequestStatus::success();
             } catch (Exception $e) {
                 return AjaxRequestStatus::failed($e->getMessage());
             }
+        }
+        throw new NotFoundHttpException();
+    }
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetBillInfo($id): array
+    {
+        if (Yii::$app->request->isAjax && Yii::$app->request->isGet) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $bill = Table_payment_bills::findOne(['cottageNumber' => Yii::$app->user->identity->username, 'id' => $id]);
+            if ($bill !== null) {
+                $transactions = Table_transactions::findAll(['billId' => $bill->id]);
+                $view = $this->renderAjax('bill-info', ['bill' => $bill, 'transactions' => $transactions]);
+                return AjaxRequestStatus::view("Информация о счёте $bill->id", $view);
+        }
+            return AjaxRequestStatus::failed("Данные о счёте $id не найдены.");
         }
         throw new NotFoundHttpException();
     }

@@ -9,6 +9,8 @@
 namespace app\assets;
 
 use yii\web\AssetBundle;
+use yii\web\YiiAsset;
+use yii\bootstrap\BootstrapAsset;
 
 class ManagementAsset extends AssetBundle
 {
@@ -22,7 +24,7 @@ class ManagementAsset extends AssetBundle
         'js/management.js',
     ];
     public $depends = [
-        'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
+        YiiAsset::class,
+        BootstrapAsset::class,
     ];
 }

@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Cottage;
 use app\models\database\MailingSchedule;
 use app\models\Fix;
+use app\models\personal_area\PersonalInfo;
 use app\models\Table_payment_bills;
 use app\models\TariffsKeeper;
 use app\models\Utils;
@@ -72,6 +73,11 @@ class SiteController extends Controller
      */
     public function actionIndex(): Response|string
     {
+        if(Yii::$app->user->can('behold')){
+            $this->layout = 'personal-area';
+            $personalInfo = new PersonalInfo();
+            return $this->render('personal-area', ['info' => $personalInfo]);
+        }
         // запущу обновление данных
         Utils::startRefreshMainData();
         // Получу информацию о зарегистрированных участках

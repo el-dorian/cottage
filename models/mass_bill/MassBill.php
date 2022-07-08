@@ -15,6 +15,7 @@ use app\models\Table_tariffs_power;
 use app\models\Table_tariffs_target;
 use app\models\TimeHandler;
 use app\models\utils\DbTransaction;
+use app\models\utils\FirebaseHandler;
 use app\validators\CashValidator;
 use JetBrains\PhpStorm\ArrayShape;
 use yii\base\Model;
@@ -365,7 +366,7 @@ class MassBill extends Model
                 $this->accruedBills[] = $newBill;
             }
             if ($newBill !== null) {
-                //(new FirebaseHandler())->sendNewBillNotification($bill);
+                (new FirebaseHandler())->sendNewBillNotification($bill);
                 if ($newBill->isMessageSend === 1) {
                     // добавлю сообщения в очередь отправки
                     MailingSchedule::addBankInvoiceSending($newBill->id, $newBill instanceof Table_payment_bills_double, true);

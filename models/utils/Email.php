@@ -108,7 +108,7 @@ class Email extends Model
      */
     public function sendToReserve(): void
     {
-        // если это админская учётка- действие не выполняется
+/*        // если это админская учётка- действие не выполняется
         if(!Yii::$app->user->can('manage')){
             $mail = Yii::$app->mailer->compose()
                 ->setFrom([$this->from => MailSettings::getInstance()->snt_name])
@@ -120,7 +120,7 @@ class Email extends Model
             }
             // попробую отправить письмо, в случае ошибки- вызову исключение
             $mail->send();
-        }
+        }*/
     }
 
     public function setAttachments(array $attachmentsArray): void

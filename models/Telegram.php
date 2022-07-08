@@ -4,6 +4,7 @@
 namespace app\models;
 
 use app\models\database\TelegramHandler;
+use app\models\handlers\BillsHandler;
 use app\priv\Info;
 use CURLFile;
 use Exception;
@@ -70,6 +71,10 @@ class Telegram
                 } catch (\Throwable $e) {
                     self::sendDebug($e->getMessage());
                 }
+            });
+            $bot->command('resend', static function ($message) use ($bot) {
+                BillsHandler::resend();
+                $bot->sendMessage($message->getChat()->getId(), 'resend');
             });
 
             $bot->on(/**

@@ -191,7 +191,7 @@ foreach ($model->accruedBills as $bill) {
                     $values .= '<b>' . $value['year'] . ' год : </b>' . CashHandler::toSmoothRubles($value['summ']) . ', ';
                     // проверю просроченность платежа
                     $payUpTime = TargetHandler::getPayUpTime($value['year']);
-                    $values .= '(срок оплаты: до ' . TimeHandler::getDatetimeFromTimestamp($payUpTime) . ')  ';
+                    $values .= '<b>С ' . TimeHandler::getDatetimeFromTimestamp($payUpTime) . ' за неоплаченный счёт будет начисляться пени!</b> ';
                     if ($payUpTime < time()) {
                         $values .= '(платёж просрочен)  ';
                     }
@@ -202,7 +202,7 @@ foreach ($model->accruedBills as $bill) {
                 foreach ($paymentContent['additionalTarget']['values'] as $value) {
                     $values .= '<b>' . $value['year'] . ' год : ' . CashHandler::toSmoothRubles($value['summ']) . ', ';
                     $payUpTime = TargetHandler::getPayUpTime($value['year']);
-                    $values .= '(срок оплаты: до ' . TimeHandler::getDatetimeFromTimestamp($payUpTime) . ')  ';
+                    $values .= '<b>С ' . TimeHandler::getDatetimeFromTimestamp($payUpTime) . ' за неоплаченный счёт будет начисляться пени!</b> ';
                     if ($payUpTime < time()) {
                         $values .= '(платёж просрочен)  ';
                     }
